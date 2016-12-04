@@ -1,0 +1,32 @@
+const User = require('../models/user');
+
+exports.signup = function(request, response, next) {
+  const email = request.body.email;
+  const password = request.body.password;
+
+  if (!email || !password) {
+    return response.status(422).send({ error: 'You must provide email and password' })
+  }
+  // See if a user with the given email exists
+  User.findOne({ email: email }, function(error, existingUser) {
+    if (error) { return next(error); }
+
+    // If user exists, return error
+    if (existingUser) {
+      return response.status(422).send({ error: 'Email is in use' });
+    }
+
+    // If a user with email does not exist, create and save user record
+    const user = new User({
+      email: email,
+      password: password
+    });
+
+    user.save(function(error) {
+      if (error) { return next(error); }
+
+      // Respond to request indicating the user was created
+      response.json({ success: true });
+    });
+  });
+}
