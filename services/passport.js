@@ -15,8 +15,10 @@ const jwtLogin = new JwtStrategy(jwtOptions, function(payload, done) {
   // See if user ID in payload exists in database
   // If it does, call 'done' with user
   // Otherwise, call 'done' without user object
-  User.findById(payload.sub, function() {
-    if (error) { return done(err, false); }
+  User.findById(payload.sub, function(error, user) {
+    if (error) { 
+      return done(error, false); 
+    }
 
     if (user) {
       done(null, user);
